@@ -1,7 +1,8 @@
 # core/cli.py
 import argparse
 from core.metadata import extract_metadata
-
+from core.metadata import extract_metadata
+from core.steganography import extract_hidden_data
 def main():
     # Initialize the parser with a custom description
     parser = argparse.ArgumentParser(
@@ -56,9 +57,13 @@ def main():
         print("-" * 30)
         
     if args.steganography:
-        print(f"[*] Searching for hidden data in '{args.image}'...")
-        # TODO: Call functions from core/steganography.py here
-
+        print(f"[*] Searching for hidden data in '{args.image}' (This may take a moment)...\n")
+        steg_results = extract_hidden_data(args.image)
+        
+        for key, value in steg_results.items():
+            print(f"{value}") # Just print the value to keep the PGP key format clean
+        print("-" * 30)
+        
     if args.output:
         print(f"[*] Results will be saved to '{args.output}'")
         # TODO: Route the extracted data to core/file_handler.py to save it
