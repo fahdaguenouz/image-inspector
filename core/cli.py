@@ -1,5 +1,6 @@
 # core/cli.py
 import argparse
+from core.metadata import extract_metadata
 
 def main():
     # Initialize the parser with a custom description
@@ -47,8 +48,12 @@ def main():
         return 1
 
     if args.metadata:
-        print(f"[*] Extracting metadata from '{args.image}'...")
-        # TODO: Call functions from core/metadata.py here
+        print(f"[*] Extracting metadata from '{args.image}'...\n")
+        metadata_results = extract_metadata(args.image)
+        
+        for key, value in metadata_results.items():
+            print(f"{key}: {value}")
+        print("-" * 30)
         
     if args.steganography:
         print(f"[*] Searching for hidden data in '{args.image}'...")
