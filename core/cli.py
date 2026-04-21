@@ -1,8 +1,10 @@
 # core/cli.py
 import argparse
-from core.metadata import extract_metadata
+import os
 from core.metadata import extract_metadata
 from core.steganography import extract_hidden_data
+from core.file_handler import save_results
+
 def main():
     # Initialize the parser with a custom description
     parser = argparse.ArgumentParser(
@@ -14,7 +16,7 @@ def main():
     # Define the optional arguments (flags)
     parser.add_argument(
         '-m', '--metadata',
-        action='store_true', # Stores True if the flag is present
+        action='store_true',
         help="Extract metadata from the image (e.g., geolocation, device info)"
     )
     
@@ -27,7 +29,7 @@ def main():
     parser.add_argument(
         '-o', '--output',
         type=str,
-        metavar='FileName',
+        metavar='"FileName"',
         help="Specify the file name to save output"
     )
 
@@ -41,31 +43,43 @@ def main():
     # Parse the arguments from the user's terminal input
     args = parser.parse_args()
 
-    # --- Skeleton Logic Routing ---
+    # --- Logic Routing ---
     
     if not args.metadata and not args.steganography:
         print("[-] No action specified. Use -m for metadata or -s for steganography.")
         print("[-] Run 'python image_inspector.py --help' for more information.")
         return 1
 
+    # Clear the output file before starting if it already exists to avoid duplicate appends
+    if args.output and os.path.exists(args.output):
+        open(args.output, 'w').close()
+
     if args.metadata:
         print(f"[*] Extracting metadata from '{args.image}'...\n")
         metadata_results = extract_metadata(args.image)
         
-        for key, value in metadata_results.items():
-            print(f"{key}: {value}")
-        print("-" * 30)
+        # Output handling for metadata
+        if args.output:
+            save_results(metadata_results, args.output, "Metadata")
+            print(f"Data saved in {args.output}")
+        else:
+            for key, value in metadata_results.items():
+                print(f"{key}: {value}")
+            print("-" * 30)
         
     if args.steganography:
         print(f"[*] Searching for hidden data in '{args.image}' (This may take a moment)...\n")
         steg_results = extract_hidden_data(args.image)
         
-        for key, value in steg_results.items():
-            print(f"{value}") # Just print the value to keep the PGP key format clean
-        print("-" * 30)
-        
-    if args.output:
-        print(f"[*] Results will be saved to '{args.output}'")
-        # TODO: Route the extracted data to core/file_handler.py to save it
+        # Output handling for steganography
+        if args.output:
+            save_results(steg_results, args.output, "Steganography")
+            # Only print the save confirmation once if both -m and -s are used
+            if not args.metadata:
+                print(f"Data saved in {args.output}")
+        else:
+            for key, value in steg_results.items():
+                print(f"{value}")
+            print("-" * 30)
 
     return 0
