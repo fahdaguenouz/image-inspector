@@ -1,4 +1,3 @@
-# core/file_handler.py
 import os
 
 def save_results(results, output_path, analysis_type):

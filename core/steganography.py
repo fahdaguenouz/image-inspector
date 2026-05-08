@@ -1,4 +1,3 @@
-# core/steganography.py
 from PIL import Image
 
 def text_to_bin(text, lsb_first=False):

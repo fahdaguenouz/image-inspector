@@ -1,4 +1,3 @@
-# core/cli.py
 import argparse
 import os
 from core.metadata import extract_metadata
